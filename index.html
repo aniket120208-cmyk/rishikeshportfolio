@@ -10,29 +10,608 @@
     <script  src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* ─── Base ─── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0a0f;
+            --card-bg: #12121a;
+            --card-border: rgba(255,255,255,0.07);
+            --accent: #6c63ff;
+            --accent2: #ff6584;
+            --text: #e2e2ee;
+            --muted: #9ca3af;
+            --tag-bg: rgba(108,99,255,0.12);
+            --tag-border: rgba(108,99,255,0.3);
+            --radius: 18px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 60px 20px 100px;
+        }
+
+        /* ─── Section title ─── */
+        .section-title {
+            text-align: center;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 3rem;
+            letter-spacing: -0.02em;
+        }
+        /* ─── Header Top (Logo + Timeline) ─── */
+        .project-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .company-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(108,99,255,0.12);
+            border: 1px solid rgba(108,99,255,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .company-logo img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+        }
+
+        /* Timeline badge */
+        .timeline {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent);
+            background: rgba(108,99,255,0.1);
+            border: 1px solid rgba(108,99,255,0.25);
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            letter-spacing: 0.04em;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ─── Grid ─── */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* ─── Project Card ─── */
+        .project-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .project-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 0%, rgba(108,99,255,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .project-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(108,99,255,0.35);
+            box-shadow: 0 16px 48px rgba(108,99,255,0.12);
+        }
+
+        /* Company icon */
+        .project-icon {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Card title */
+        .project-card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text);
+        }
+
+        /* ─── Bullet points on card ─── */
+        .card-bullets {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            flex: 1;
+        }
+        .card-bullets li {
+            font-size: 0.82rem;
+            color: var(--muted);
+            line-height: 1.5;
+            padding-left: 1.1rem;
+            position: relative;
+        }
+        .card-bullets li::before {
+            content: '›';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 700;
+        }
+        /* bullets beyond index 1 are hidden on card */
+        .card-bullets li.hidden-bullet {
+            display: none;
+        }
+
+        /* ─── Tags ─── */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .tag {
+            background: var(--tag-bg);
+            border: 1px solid var(--tag-border);
+            color: var(--accent);
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.7rem;
+            border-radius: 999px;
+            letter-spacing: 0.02em;
+        }
+        /* ─── TIMELINE LAYOUT ─── */
+        .timeline-container {
+            position: relative;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-left: 30px;
+        }
+
+        /* Vertical line */
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+        }
+
+        /* Each item */
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        /* Dot */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2px;
+            top: 20px;
+            width: 14px;
+            height: 14px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(108,99,255,0.15);
+        }
+
+        /* Card adjustment */
+        .timeline-item .project-card {
+            margin-left: 20px;
+        }
+
+        /* ─── COMPANY LOGO GLOW ─── */
+        .company-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(108,99,255,0.1);
+            border: 1px solid rgba(108,99,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .company-logo img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+        }
+
+        /* Glow effect */
+        .project-card:hover .company-logo {
+            box-shadow: 0 0 25px rgba(108,99,255,0.6);
+            transform: scale(1.05);
+        }
+
+        /* ─── TOP BAR ─── */
+        .project-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Timeline badge */
+        .timeline-date {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent);
+            background: rgba(108,99,255,0.12);
+            padding: 0.3rem 0.7rem;
+            border-radius: 999px;
+            border: 1px solid rgba(108,99,255,0.3);
+        }
+
+        /* ─── HOVER PREMIUM EFFECT ─── */
+        .project-card:hover {
+            transform: translateY(-6px) scale(1.01);
+        }
+
+        /* ─── MOBILE FIX ─── */
+        @media (max-width: 600px) {
+            .timeline-container {
+                padding-left: 20px;
+            }
+
+            .timeline-container::before {
+                left: 6px;
+            }
+
+            .timeline-item::before {
+                left: -6px;
+            }
+        }
+        /* ─── View More Button ─── */
+        .view-more-btn {
+            align-self: flex-start;
+            background: transparent;
+            border: 1px solid rgba(108,99,255,0.4);
+            color: var(--accent);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.45rem 1rem;
+            border-radius: 999px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            letter-spacing: 0.03em;
+            transition: background 0.2s, border-color 0.2s, transform 0.2s;
+        }
+        .view-more-btn:hover {
+            background: rgba(108,99,255,0.14);
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+        .view-more-btn i { font-size: 0.9rem; }
+
+        /* ══════════════════════════════════════
+           MODAL OVERLAY
+        ══════════════════════════════════════ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.72);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Modal Card */
+        .modal-card {
+            background: #16161f;
+            border: 1px solid rgba(108,99,255,0.3);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 620px;
+            max-height: 88vh;
+            overflow-y: auto;
+            padding: 2.4rem;
+            position: relative;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(108,99,255,0.1) inset;
+
+            /* Entry animation */
+            transform: scale(0.88) translateY(24px);
+            opacity: 0;
+            transition: transform 0.38s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+        }
+        .modal-overlay.open .modal-card {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        /* Scrollbar styling */
+        .modal-card::-webkit-scrollbar { width: 5px; }
+        .modal-card::-webkit-scrollbar-track { background: transparent; }
+        .modal-card::-webkit-scrollbar-thumb { background: rgba(108,99,255,0.35); border-radius: 99px; }
+
+        /* Decorative glow inside modal */
+        .modal-card::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(108,99,255,0.18) 0%, transparent 70%);
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        /* Close button */
+        .modal-close {
+            position: absolute;
+            top: 1.2rem; right: 1.2rem;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--muted);
+            font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+        }
+        .modal-close:hover {
+            background: rgba(255,101,132,0.15);
+            color: var(--accent2);
+            transform: rotate(90deg);
+        }
+
+        /* Modal header */
+        .modal-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.6rem;
+        }
+        .modal-icon-wrap {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            background: rgba(108,99,255,0.12);
+            border: 1px solid rgba(108,99,255,0.25);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .modal-icon-wrap i {
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .modal-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--text);
+        }
+        .modal-subtitle {
+            font-size: 0.78rem;
+            color: var(--accent);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            margin-top: 0.25rem;
+            text-transform: uppercase;
+        }
+
+        /* Divider */
+        .modal-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.06);
+            margin: 1.4rem 0;
+        }
+
+        /* Section label inside modal */
+        .modal-section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .modal-section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(108,99,255,0.2);
+        }
+
+        /* All bullets in modal */
+        .modal-bullets {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.6rem;
+        }
+        .modal-bullets li {
+            font-size: 0.88rem;
+            color: var(--muted);
+            line-height: 1.6;
+            padding: 0.65rem 0.85rem 0.65rem 1.1rem;
+            background: rgba(255,255,255,0.025);
+            border-radius: 10px;
+            border-left: 2px solid rgba(108,99,255,0.5);
+            position: relative;
+
+            /* Staggered pop-in */
+            opacity: 0;
+            transform: translateX(-10px);
+            animation: bulletIn 0.4s ease forwards;
+        }
+
+        @keyframes bulletIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Modal tags */
+        .modal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .modal-tags .tag {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.85rem;
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 500px) {
+            .modal-card { padding: 1.6rem 1.3rem; }
+            .modal-title { font-size: 0.95rem; }
+            .modal-bullets li { font-size: 0.83rem; }
+        }
+        .company-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .company-logo {
+            background: white;
+            padding: 6px;
+        }
+        /* ─── SCROLL REVEAL ─── */
+.hidden {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s ease;
+}
+.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ─── SMOOTH SCROLL ─── */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ─── CURSOR GLOW ─── */
+.cursor-dot, .cursor-outline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    border-radius: 50%;
+}
+
+.cursor-dot {
+    width: 6px;
+    height: 6px;
+    background: #fff;
+}
+
+.cursor-outline {
+    width: 35px;
+    height: 35px;
+    border: 2px solid rgba(108,99,255,0.5);
+    transition: transform 0.15s ease;
+}
+
+/* ─── PARTICLE BACKGROUND ─── */
+.particles {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.particles span {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgba(108,99,255,0.4);
+    border-radius: 50%;
+    animation: float 10s linear infinite;
+}
+
+@keyframes float {
+    from {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(-10vh) scale(1);
+        opacity: 1;
+    }
+}
+    </style>
 </head>
 <body>
-
+ 
     <div class="cursor-dot" data-cursor-dot></div>
     <div class="cursor-outline" data-cursor-outline></div>
 
-    <nav>
-        <div class="container nav-content">
-            <div class="logo">RISHIKESH TIWARI<span class="gradient-text">.</span></div>
-            <div class="nav-links">
-                <a href="#home">Home</a>
-                <a href="#about">About</a>
-                <a href="#projects">Emplyment History</a>
-                <a href="#contact">Contact</a>
-            </div>
+   <nav>
+    <div class="container nav-content">
+
+        <!-- Logo -->
+        <div class="logo">
+            RISHIKESH TIWARI<span class="gradient-text">.</span>
         </div>
-    </nav>
+
+        <!-- Hamburger -->
+        <div class="menu-toggle" id="menu-toggle">☰</div>
+
+        <!-- Navigation Links -->
+        <div class="nav-links" id="nav-links">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#projects">Employment History</a>
+            <a href="#contact">Contact</a>
+        </div>
+
+    </div>
+</nav>
 
     <section id="home" class="hero">
         <div class="hero-bg-blob"></div>
         <div class="container">
             <div class="hero-layout">
                 <div class="hero-content hidden">
+                    
                     <h1>Hi, I'm <br><span class="gradient-text">Rishikesh Tiwari</span></h1>
                     <p id="typing-text"></p>
                     <a href="#projects" class="btn">View My Work</a>
@@ -79,46 +658,280 @@ to facilitate informed business decisions and drive organizational profitability
     </section>
 
     <section id="projects">
-        <div class="container">
-            <h2 class="section-title hidden">Featured <span class="gradient-text">Projects</span></h2>
-            <div class="projects-grid">
-                
-                <div class="project-card hidden">
-                    <i class="ph ph-database project-icon"></i>
-                    <h3>Full-Stack Dashboard</h3>
-                    <p>A comprehensive admin panel featuring secure JWT authentication, RESTful APIs, and real-time data metrics.</p>
+    <div class="container">
+        <h2 class="section-title">Employment <span class="gradient-text">History</span></h2>
+
+        <div class="timeline-container">
+
+            <!-- ── 1 ── -->
+            <div class="timeline-item">
+                <div class="project-card"
+                    data-title="Associate Financial Controller"
+                    data-company="Maersk Tankers (I) Pvt. Ltd."
+                    data-icon="ph-database"
+                    data-tags="Financial Analysis,P&L Management,IFRS,ERP"
+                    data-bullets='[
+                        "Processing joint-venture profit allocations and ensuring accurate settlements.",
+                        "Delivering insights on profitability, working capital, and cash flow.",
+                        "Reviewing month-end accruals and cost variances.",
+                        "Leading intercompany reconciliations and resolving audit queries.",
+                        "Ensuring compliance with IFRS and internal controls.",
+                        "Supporting budgeting & forecasting with variance analysis."
+                    ]'>
+
+                    <div class="project-top">
+                        <div class="company-logo">
+                            <img src="images/logos/maersk.png" alt="Maersk">
+
+                        </div>
+                        <div class="timeline-date">2018 – Present</div>
+                    </div>
+
+                    <h3>Associate Financial Controller</h3>
+
+                    <ul class="card-bullets">
+                        <li>Processing joint-venture profit allocations and ensuring accuracy.</li>
+                        <li>Providing insights on cash flow and profitability.</li>
+                        <li class="hidden-bullet">Hidden</li>
+                    </ul>
+
+                    <button class="view-more-btn">View Details</button>
+
                     <div class="tags">
-                        <span class="tag">MERN Stack</span>
-                        <span class="tag">Tailwind</span>
-                        <span class="tag">Redux</span>
+                        <span class="tag">Financial Analysis</span>
+                        <span class="tag">IFRS</span>
+                        <span class="tag">Cash Flow</span>
                     </div>
                 </div>
+            </div>
 
-                <div class="project-card hidden" style="transition-delay: 100ms;">
-                    <i class="ph ph-cloud-arrow-up project-icon"></i>
-                    <h3>Cloud Deployment Pipeline</h3>
-                    <p>Automated CI/CD pipeline setup for deploying containerized web applications directly to AWS architecture.</p>
+            <!-- ── 2 ── -->
+            <div class="timeline-item">
+                <div class="project-card"
+                    data-title="Senior Specialist"
+                    data-company="Maersk Global Service Centre"
+                    data-icon="ph-chart-line-up"
+                    data-tags="MIS,Reconciliation,Audit,Reporting"
+                    data-bullets='[
+                        "Executed balance sheet and bank reconciliations.",
+                        "Managed month-end close and financial reviews.",
+                        "Prepared MIS and variance analysis reports.",
+                        "Handled multiple entity bank reconciliations.",
+                        "Supported audits and ensured compliance.",
+                        "Improved reporting efficiency through process optimization."
+                    ]'>
+
+                    <div class="project-top">
+                        <div class="company-logo">
+                            <img src="images/logos/maersk.png" alt="Maersk">
+                        </div>
+                        <div class="timeline-date">2015 – 2018</div>
+                    </div>
+
+                    <h3>Senior Specialist</h3>
+
+                    <ul class="card-bullets">
+                        <li>Managed reconciliations and month-end close.</li>
+                        <li>Prepared MIS and financial reports.</li>
+                        <li class="hidden-bullet">Hidden</li>
+                    </ul>
+
+                    <button class="view-more-btn">View Details</button>
+
                     <div class="tags">
-                        <span class="tag">Docker</span>
-                        <span class="tag">GitHub Actions</span>
-                        <span class="tag">AWS EC2</span>
+                        <span class="tag">MIS</span>
+                        <span class="tag">Audit</span>
+                        <span class="tag">Reconciliation</span>
                     </div>
                 </div>
+            </div>
 
-                <div class="project-card hidden" style="transition-delay: 200ms;">
-                    <i class="ph ph-shopping-cart project-icon"></i>
-                    <h3>E-Commerce Platform</h3>
-                    <p>A fully responsive shopping experience with Stripe payment integration, cart state management, and an admin dashboard.</p>
+            <!-- ── 3 ── -->
+            <div class="timeline-item">
+                <div class="project-card"
+                    data-title="Lead Associate"
+                    data-company="WNS Global Services"
+                    data-icon="ph-users-three"
+                    data-tags="Team,GL,Month-End"
+                    data-bullets='[
+                        "Handled balance sheet and fixed asset reconciliations.",
+                        "Executed intercompany and bank reconciliations.",
+                        "Managed full month-end closing process.",
+                        "Reviewed journal entries and variances.",
+                        "Collaborated with global teams.",
+                        "Trained team members and improved efficiency."
+                    ]'>
+
+                    <div class="project-top">
+                        <div class="company-logo">
+                            <img src="images/logos/wns.png" alt="WNS">
+                        </div>
+                        <div class="timeline-date">2012 – 2015</div>
+                    </div>
+
+                    <h3>Lead Associate</h3>
+
+                    <ul class="card-bullets">
+                        <li>Managed reconciliations and reporting.</li>
+                        <li>Improved team efficiency and workflows.</li>
+                        <li class="hidden-bullet">Hidden</li>
+                    </ul>
+
+                    <button class="view-more-btn">View Details</button>
+
                     <div class="tags">
-                        <span class="tag">React</span>
-                        <span class="tag">Node.js</span>
-                        <span class="tag">Stripe API</span>
+                        <span class="tag">Team Mgmt</span>
+                        <span class="tag">GL</span>
+                        <span class="tag">Process</span>
                     </div>
                 </div>
+            </div>
 
+            <!-- ── 4 ── -->
+            <div class="timeline-item">
+                <div class="project-card"
+                    data-title="Assistant Accountant"
+                    data-company="Gorunga Tea Estate"
+                    data-icon="ph-tree"
+                    data-tags="MIS,Budgeting,Compliance"
+                    data-bullets='[
+                        "Handled full accounting and MIS reporting.",
+                        "Managed banking and store operations.",
+                        "Supported budgeting and planning.",
+                        "Ensured compliance and controls."
+                    ]'>
+
+                    <div class="project-top">
+                        <div class="company-logo">
+                            <img src="images/logos/gillanders.png" alt="Gillanders">
+                        </div>
+                        <div class="timeline-date">2012</div>
+                    </div>
+
+                    <h3>Assistant Accountant</h3>
+
+                    <ul class="card-bullets">
+                        <li>Handled MIS and accounting operations.</li>
+                        <li>Managed budgeting and compliance.</li>
+                        <li class="hidden-bullet">Hidden</li>
+                    </ul>
+
+                    <button class="view-more-btn">View Details</button>
+
+                    <div class="tags">
+                        <span class="tag">MIS</span>
+                        <span class="tag">Budgeting</span>
+                        <span class="tag">Compliance</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── 5 ── -->
+            <div class="timeline-item">
+                <div class="project-card"
+                    data-title="Accountant"
+                    data-company="Jayshree Tea & Industries"
+                    data-icon="ph-leaf"
+                    data-tags="Tally,Audit,AR/AP"
+                    data-bullets='[
+                        "Performed bank reconciliations and ledger management.",
+                        "Handled invoicing and stock audits.",
+                        "Managed accounts payable/receivable.",
+                        "Supported budgeting and compliance."
+                    ]'>
+
+                    <div class="project-top">
+                        <div class="company-logo">
+                            <img src="images/logos/jayshree.png" alt="Jayshree">
+                        </div>
+                        <div class="timeline-date">2011 – 2012</div>
+                    </div>
+
+                    <h3>Accountant</h3>
+
+                    <ul class="card-bullets">
+                        <li>Handled invoicing and financial records.</li>
+                        <li>Managed AR/AP and compliance.</li>
+                        <li class="hidden-bullet">Hidden</li>
+                    </ul>
+
+                    <button class="view-more-btn">View Details</button>
+
+                    <div class="tags">
+                        <span class="tag">Tally</span>
+                        <span class="tag">Audit</span>
+                        <span class="tag">AR/AP</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── 6 ── -->
+            <div class="timeline-item">
+                <div class="project-card"
+                    data-title="Accountant"
+                    data-company="Emami Biotech Ltd."
+                    data-icon="ph-flask"
+                    data-tags="P&L,Operations,Compliance"
+                    data-bullets='[
+                        "Managed accounts payable/receivable.",
+                        "Performed bank reconciliations.",
+                        "Prepared P&L statements.",
+                        "Handled daily financial operations and compliance."
+                    ]'>
+
+                    <div class="project-top">
+                        <div class="company-logo">
+                            <img src="images/logos/emami.png" alt="Emami">
+                        </div>
+                        <div class="timeline-date">2008 – 2011</div>
+                    </div>
+
+                    <h3>Accountant</h3>
+
+                    <ul class="card-bullets">
+                        <li>Handled P&L and reconciliations.</li>
+                        <li>Managed operations and compliance.</li>
+                        <li class="hidden-bullet">Hidden</li>
+                    </ul>
+
+                    <button class="view-more-btn">View Details</button>
+
+                    <div class="tags">
+                        <span class="tag">P&L</span>
+                        <span class="tag">Compliance</span>
+                        <span class="tag">Operations</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ══════════ MODAL ══════════ -->
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card" id="modalCard">
+        <button class="modal-close" id="modalClose" aria-label="Close"><i class="ph ph-x"></i></button>
+
+        <div class="modal-header">
+            <div class="modal-icon-wrap">
+                <i class="ph" id="modalIcon"></i>
+            </div>
+            <div>
+                <div class="modal-title" id="modalTitle">–</div>
+                <div class="modal-subtitle" id="modalCompany">–</div>
             </div>
         </div>
-    </section>
+
+        <div class="modal-divider"></div>
+
+        <div class="modal-section-label">Responsibilities</div>
+        <ul class="modal-bullets" id="modalBullets"></ul>
+
+        <div class="modal-section-label">Skills &amp; Tools</div>
+        <div class="modal-tags" id="modalTags"></div>
+    </div>
+</div>
 
     <section id="contact">
         <div class="container hidden">
@@ -128,12 +941,14 @@ to facilitate informed business decisions and drive organizational profitability
                 <div class="contact-info">
                     <h3 style="font-size: 2rem; margin-bottom: 1rem;">Get in Touch</h3>
                     <p>
-                        I'm currently looking for new opportunities and collaborations. Whether you have a question about my work or just want to say hi, I'll try my best to get back to you!
+                        RISHIKESH TIWARI<br>
+ +91-8007772313, +91-8657242042  <br>tiwari_rishikesh@yahoo.co.in<br>
+ Ashapura Darshan Chs Ltd, B 204, Dombivali E, Thane, Maharastra, 421204, India
                     </p>
                     <div class="social-links">
-                        <a href="https://github.com" target="_blank"><i class="ph ph-github-logo"></i></a>
-                        <a href="https://linkdin.com"><i class="ph ph-linkedin-logo"></i></a>
-                        <a href=""><i class="ph ph-envelope-simple"></i></a>
+                        <a href="https://wa.me/+918007772313" target="_blank"><i class="ph ph-whatsapp-logo"></i></a>
+                        <a href="https://www.linkedin.com/in/rishikesh-tiwari-792a05148/" target="_blank"><i class="ph ph-linkedin-logo"></i></a>
+                        <a href="mailto:aniket120208@gmail.com" target="_blank" rel="noopener noreferrer"><i class="ph ph-envelope-simple"></i></a>
                     </div>
                 </div>
 
@@ -146,7 +961,7 @@ to facilitate informed business decisions and drive organizational profitability
                             <input type="email" id="email" placeholder="Your Email" required>
                         </div>
                         <div class="form-group">
-                            <input type="number" id="email" placeholder="Your number" required>
+                            <input type="number" id="number" placeholder="Your number" required>
                         </div>
                         <div class="form-group">
                             <textarea id="message" placeholder="Your Message" required></textarea>
@@ -160,9 +975,83 @@ to facilitate informed business decisions and drive organizational profitability
 
     <footer>
         <div class="container">
-            <p>&copy; 2026 ______________. Built with HTML, CSS, & JS.</p>
+            <p>&copy;  2026 Rishikesh. All rights reserved.</p>
         </div>
     </footer>
+    <script>
+    const overlay   = document.getElementById('modalOverlay');
+    const modalCard = document.getElementById('modalCard');
+    const modalClose = document.getElementById('modalClose');
+    const modalIcon  = document.getElementById('modalIcon');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalCompany = document.getElementById('modalCompany');
+    const modalBullets = document.getElementById('modalBullets');
+    const modalTagsEl  = document.getElementById('modalTags');
+
+    function openModal(card) {
+        const title   = card.dataset.title;
+        const company = card.dataset.company;
+        const icon    = card.dataset.icon;
+        const bullets = JSON.parse(card.dataset.bullets);
+        const tags    = card.dataset.tags.split(',').map(t => t.trim());
+
+        // Populate
+        modalIcon.className = `ph ${icon}`;
+        modalTitle.textContent   = title;
+        modalCompany.textContent = company;
+
+        // Bullets with staggered animation
+        modalBullets.innerHTML = '';
+        bullets.forEach((b, i) => {
+            const li = document.createElement('li');
+            li.textContent = b;
+            li.style.animationDelay = `${i * 60}ms`;
+            modalBullets.appendChild(li);
+        });
+
+        // Tags
+        modalTagsEl.innerHTML = '';
+        tags.forEach(t => {
+            const span = document.createElement('span');
+            span.className = 'tag';
+            span.textContent = t;
+            modalTagsEl.appendChild(span);
+        });
+
+        // Scroll modal to top
+        modalCard.scrollTop = 0;
+
+        // Open
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // Wire up every "View Details" button
+    document.querySelectorAll('.view-more-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const card = btn.closest('.project-card');
+            openModal(card);
+        });
+    });
+
+    modalClose.addEventListener('click', closeModal);
+
+    // Click outside modal card to close
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay) closeModal();
+    });
+
+    // Escape key
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeModal();
+    });
+    
+</script>
 
     <script src="script.js"></script>
 </body>
